@@ -11,14 +11,22 @@ type SummonerById struct {
 }
 
 type Event struct {
-	EventId int32
-	EventName string
-	EventTime float64
-	Assisters []string
+	EventId    int32
+	EventName  string
+	EventTime  float64
+	Assisters  []string
 	KillerName string
 	VictimName string
 }
 
 type Events struct {
 	Events []Event
+}
+
+type GameStats struct {
+	GameMode   string
+	GameTime   float64
+	MapName    string
+	MapNumber  int8
+	MapTerrain string
 }

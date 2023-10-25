@@ -1,4 +1,4 @@
-module github.com/hellcattc/respectengine
+module github.com/hellcattc/respectng
 
 go 1.20
 

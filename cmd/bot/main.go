@@ -5,12 +5,13 @@ import (
 	"log"
 	"os"
 
-	"github.com/hellcattc/respectengine/internal/requests"
+	"github.com/hellcattc/respectng/internal/requests"
+	"github.com/hellcattc/respectng/internal/respect"
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load();
+	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Couldn't load API Key")
 	}
@@ -22,10 +23,8 @@ func main() {
 	}
 	form, _ := json.MarshalIndent(resp, "", "   ")
 	log.Println(string(form))
-	resp1, err1 := handler.GetLiveClientEvents()
-	form, _ = json.MarshalIndent(resp1, "", "    ")
-	if err1 != nil {
-		log.Fatalf("Couldn't retrieve events: %v", err)
-	}
-	log.Println(json.MarshalIndent(form, "", "   "))
+	// ctx, cancel := context.WithTimeout(context.Background(), time.Second*4)
+	// defer cancel()
+	engine := respect.NewRespectEngine(*handler)
+	engine.ListenForEvents()
 }

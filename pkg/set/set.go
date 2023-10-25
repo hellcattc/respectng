@@ -1,8 +1,8 @@
-package set;
+package set
 
 type Set map[any]struct{}
 
-func (s Set) Has(key any) (bool) {
+func (s Set) Has(key any) bool {
 	_, exists := s[key]
 	return exists
 }

@@ -5,17 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
+	// "log"
 	"net/http"
-	"time"
-
-	"github.com/hellcattc/respectengine/pkg/set"
 )
 
 type RequestHandler struct {
-	RIOT_API_KEY string
+	RIOT_API_KEY  string
 	networkClient http.Client
-	localClient http.Client
+	localClient   http.Client
 }
 
 func NewRequestHandler(apiKey string) *RequestHandler {
@@ -24,9 +21,9 @@ func NewRequestHandler(apiKey string) *RequestHandler {
 	}
 	client := &http.Client{Transport: tr}
 	return &RequestHandler{
-		RIOT_API_KEY: apiKey,
+		RIOT_API_KEY:  apiKey,
 		networkClient: http.Client{},
-		localClient: *client,
+		localClient:   *client,
 	}
 }
 
@@ -43,11 +40,11 @@ func (s *RequestHandler) execRequest(req *http.Request) ([]byte, error) {
 	return body, nil
 }
 
-func (s *RequestHandler) execClientLiveRequest(endpoint string) ([]byte, error) {
+func (s *RequestHandler) ExecClientLiveRequest(endpoint string) ([]byte, error) {
 	url := fmt.Sprintf("https://127.0.0.1:2999/liveclientdata/%s", endpoint)
-	log.Println(url)
+	// log.Println(url)
 	resp, err := s.localClient.Get(url)
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 	body, err := io.ReadAll(resp.Body)
@@ -78,30 +75,4 @@ func (s *RequestHandler) GetSummonerByName(name string) (*SummonerById, error) {
 	var summoner SummonerById
 	json.Unmarshal(resp, &summoner)
 	return &summoner, nil
-}
-
-func (s *RequestHandler) GetLiveClientEvents() (<-chan *Event, error) {
-	eventsChan := make(chan *Event)
-	go func () {
-		defer close(eventsChan)
-		eventsSet := make(set.Set)
-		for {
-			body, err := s.execClientLiveRequest("eventdata")
-			if err != nil {
-				log.Println("Couldn't execute long-polling request: ", err)
-			}
-			var events Events
-			json.Unmarshal(body, &events)
-			lastevent := events.Events[len(events.Events)-1]
-			if err != nil {
-				log.Println("Couldn't unmarshal events: ", err)
-			}
-			if !(eventsSet.Has(lastevent.EventTime)) {
-				eventsSet.Add(lastevent.EventTime)
-				eventsChan <- &lastevent
-			}
-			time.Sleep(1 * time.Second)
-		}
-	}()
-	return eventsChan, nil
 }
